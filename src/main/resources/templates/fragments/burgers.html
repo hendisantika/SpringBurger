@@ -1,0 +1,60 @@
+<div class="row">
+    <center>
+        <!-- Left side (ready to eat) -->
+        <div class="col-md-6">
+            <h4 class="red_font">Ready to eat!</h4>
+            <div id="ready_to_eat">
+
+                <!-- Dynamically Insert Ready Burgers Here -->
+                <div th:each="burger : ${edibleBurgers}">
+                    <form th:action="@{/devour/} + ${burger.key}" method="POST">
+                        <div class="input-group">
+                            <li class="form-control">
+                                <div class="col-md-7 col-xs-7">
+                                    <span th:text="${burger.key}"></span>.
+                                    <span th:text="${burger.value}"></span>
+                                </div>
+                                <div class="col-md-5 col-xs-5">
+                                    <input name="burgerEater" type="text" class="form-control bugerEaterTextBox"
+                                           placeholder="Customer Name"/>
+                                </div>
+                            </li>
+                            <span class="input-group-btn">
+                  <button class="btn btn-success devour-button" type="submit"
+                          th:value="${burger.key}">Devour It!</button>
+                </span>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- Right side (already eaten) -->
+        <div class="col-md-6">
+            <h4 class="red_font">Already eaten!</h4>
+            <div id="already_eaten">
+
+                <!-- Dynamically Insert Eaten Burgers Here -->
+                <div th:each="burger : ${consumedBurgers}">
+                    <div class="input-group">
+                        <li class="form-control">
+                            <div class="col-md-6 col-xs-6">
+                                <span th:text="${burger.key}"></span>.
+                                <span th:text="${burger.value[0]}"></span>
+                            </div>
+                            <div class="col-md-6 col-xs-6"><i>(Eaten by <span th:text="${burger.value[1]}"></span>)</i>
+                            </div>
+                        </li>
+                        <span class="input-group-btn">
+                <button class="btn btn-info whine-button" type="button">Whine!</button>
+              </span>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </center>
+</div>
