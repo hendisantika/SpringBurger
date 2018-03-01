@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Eat da Burger!</title>
+    <link rel="icon" th:href="@{/img/KrabbyPatty.png}"/>
+    <link rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/style/style.css}"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+
+<!-- Page Container -->
+<div class="container">
+
+    <br/>
+
+    <!-- Burger Image -->
+    <center>
+        <div class="row">
+            <img th:src="@{/img/KrabbyPatty.png}"/>
+        </div>
+    </center>
+
+    <!-- Page Title -->
+    <center>
+        <h1 class="red_font">Java da Burger!
+            <small class="tiny_text">Best with a side of audio.</small>
+        </h1>
+    </center>
+
+    <br/>
+
+
+    <!-- Burger Content Partial -->
+    <div class="row">
+        <th:block layout:include="fragments/burgers"/>
+    </div>
+
+
+    <br/>
+
+
+    <!-- Input New Burgers Form -->
+    <div class="row">
+        <form th:action="@{/cook}" method="POST">
+
+            <!-- Text Area Input -->
+            <div class="row">
+                <!-- Empty Div to help center textarea -->
+                <div class="col-md-3"></div>
+
+                <!-- Burger Input Box -->
+                <div class="form-group col-md-6">
+                    <br/><br/>
+                    <center><label for="new_burger" class="red_font">Request a new burger and place your order!</label>
+                    </center>
+                    <textarea class="form-control" columns="8" rows="4" id="new_burger" name="burgerName"></textarea>
+                </div>
+
+                <!-- Empty Div to help center textarea -->
+                <div class="col-md-3"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <center>
+                <button id="submit-button" type="submit" class="btn btn-danger">Place Order</button>
+            </center>
+
+        </form>
+    </div>
+
+    <br/>
+
+</div>
+
+<!-- Link in jQuery -->
+<script th:src="@{https://code.jquery.com/jquery-3.1.1.min.js}"></script>
+
+<!-- Link in JavaScript -->
+<script th:src="@{/js/burgerSounds.js}"></script>
+
+</body>
+</html>
