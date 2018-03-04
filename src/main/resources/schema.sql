@@ -1,7 +1,7 @@
 
 -- Database Creation
 CREATE DATABASE burgers;
-USE burgers_db;
+USE burgers;
 
 
 -- Table Creation of Burgers
