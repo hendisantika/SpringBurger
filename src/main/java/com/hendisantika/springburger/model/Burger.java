@@ -1,5 +1,10 @@
 package com.hendisantika.springburger.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * Created by IntelliJ IDEA.
  * Project : spring-burger
@@ -10,7 +15,11 @@ package com.hendisantika.springburger.model;
  * Time: 07.02
  * To change this template use File | Settings | File Templates.
  */
+@Entity
 public class Burger {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
     private String burgerName;
     private boolean devoured;
 
@@ -20,13 +29,27 @@ public class Burger {
         this.devoured = false;
     }
 
-    // Getter for Burger Name
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getBurgerName() {
         return burgerName;
     }
 
-    // Getter for Burger Status
-    public boolean getDevoured() {
+    public void setBurgerName(String burgerName) {
+        this.burgerName = burgerName;
+    }
+
+    public boolean isDevoured() {
         return devoured;
+    }
+
+    public void setDevoured(boolean devoured) {
+        this.devoured = devoured;
     }
 }
