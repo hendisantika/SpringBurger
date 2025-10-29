@@ -1,0 +1,52 @@
+services:
+  mysql:
+    image: mysql:9.5.0
+    container_name: springburger-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: burgers
+      MYSQL_USER: yu71
+      MYSQL_PASSWORD: 53cret
+      MYSQL_ROOT_PASSWORD: r00tP@ssw0rd
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    tmpfs:
+      - /var/run/mysqld
+    networks:
+      - springburger-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uyu71", "-p53cret" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springburger-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/burgers
+      SPRING_DATASOURCE_USERNAME: yu71
+      SPRING_DATASOURCE_PASSWORD: 53cret
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - springburger-network
+
+networks:
+  springburger-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
