@@ -1,5 +1,6 @@
 package com.hendisantika.springburger.controller;
 
+import com.hendisantika.springburger.model.Burger;
 import com.hendisantika.springburger.model.Devourer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -159,6 +160,48 @@ public class IndexController {
         }
 
         // Re-direct to index route to re-render the page with new devourer
+        return "redirect:/";
+
+    }
+
+    @GetMapping("/cook")
+    public String devour(@RequestParam(value = "burgerName", required = true) String burgerName) {
+
+        // Print Fields: Burger Name comes from Request Parameter
+        log.info("Order Up!");
+        log.info("Burger Name: \"{}\"", burgerName);
+
+        // If no name is given, give a default name
+        if (burgerName == "") {
+            burgerName = "Default Burger";
+        }
+
+        // Create new Burger class using Burger Name (this is more for practice than anything else)
+        Burger newBurger = new Burger(burgerName);
+
+
+        // Connect to MySQL Database
+        try {
+
+            // Create MySQL Connection based on localhost or Heroku deployment
+            // This uses the instance variables created when the index route was hit
+            Connection conn = DriverManager.getConnection(url, userName, password);
+
+            // Insert a new burger
+            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO burgers(burgername, devoured) VALUES (?, ?)");
+            preparedStmt.setString(1, newBurger.getBurgerName());
+            preparedStmt.setBoolean(2, newBurger.getDevoured());
+            preparedStmt.execute();
+
+            // Close MySQL Connection
+            conn.close();
+
+        } catch (SQLException err) {
+            log.error(String.valueOf(err));
+        }
+
+
+        // Re-direct to index route to re-render the page with new burger
         return "redirect:/";
 
     }
