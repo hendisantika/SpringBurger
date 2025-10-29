@@ -1,11 +1,16 @@
 package com.hendisantika.springburger.controller;
 
+import com.hendisantika.springburger.model.Devourer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,6 +27,7 @@ import java.util.HashMap;
  * Time: 06.20
  * To change this template use File | Settings | File Templates.
  */
+@Slf4j
 @Controller
 public class IndexController {
 
@@ -101,11 +107,61 @@ public class IndexController {
             conn.close();
 
         } catch (SQLException err) {
-            System.out.println(err);
+            log.error(String.valueOf(err));
         }
 
         // Render the index.html page
         return "index";
     }
+
+    @GetMapping("/devour/{burgerId}")
+    public String devour(@PathVariable(value = "burgerId") int burgerId, @RequestParam(value = "burgerEater", required = true) String burgerEater) {
+
+        // Print Fields: Burger Id comes from URL Path Variable and Burger Devourer Name from Request Parameter
+        log.info("Yummy!");
+        log.info("Burger Id: \"{}\" and Devourer Name: \"{}\"", burgerId, burgerEater);
+
+        // If no name is given, default to Anonymous
+        if (burgerEater == "") {
+            burgerEater = "Anonymous";
+        }
+
+
+        // Create new Devourer class using Burger Id and Devourer Name (this is more for practice than anything else)
+        Devourer newBurgerEater = new Devourer(burgerEater, burgerId);
+
+
+        // Connect to MySQL Database
+        try {
+
+            // Create MySQL Connection based on localhost or Heroku deployment
+            // This uses the instance variables created when the index route was hit
+            Connection conn = DriverManager.getConnection(url, userName, password);
+
+
+            // Update selected burger to devoured
+            Statement updateDevouredBurger = conn.createStatement();
+            updateDevouredBurger.executeUpdate("UPDATE burgers SET devoured=true WHERE id = " + burgerId);
+
+
+            // Insert a new devourer
+            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO devourers(devourername, burgerid) VALUES (?, ?)");
+            preparedStmt.setString(1, newBurgerEater.getDevourerName());
+            preparedStmt.setInt(2, newBurgerEater.getBurgerId());
+            preparedStmt.execute();
+
+
+            // Close MySQL Connection
+            conn.close();
+
+        } catch (SQLException err) {
+            log.error(String.valueOf(err));
+        }
+
+        // Re-direct to index route to re-render the page with new devourer
+        return "redirect:/";
+
+    }
+
 
 }
