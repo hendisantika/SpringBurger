@@ -1,9 +1,12 @@
 package com.hendisantika.springburger.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,40 +19,21 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Burger {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
+
     private String burgerName;
+
     private boolean devoured;
 
-    // Constructor
+    // Constructor for creating new burgers
     public Burger(String burgerName) {
         this.burgerName = burgerName;
         this.devoured = false;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getBurgerName() {
-        return burgerName;
-    }
-
-    public void setBurgerName(String burgerName) {
-        this.burgerName = burgerName;
-    }
-
-    public boolean isDevoured() {
-        return devoured;
-    }
-
-    public void setDevoured(boolean devoured) {
-        this.devoured = devoured;
     }
 }
