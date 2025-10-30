@@ -2,6 +2,8 @@
 
 A re-make of my classic burger app using Java, Maven, MySQL, and the Spring Boot framework.
 
+![Burger Home Page](img/image.png "Burger Home Page")
+
 ## Technology Stack
 
 - Java 21
