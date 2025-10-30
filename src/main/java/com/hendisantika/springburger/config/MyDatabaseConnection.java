@@ -17,50 +17,58 @@ import lombok.extern.slf4j.Slf4j;
 public class MyDatabaseConnection {
     private String userName;
     private String password;
-    private String dataBaseURL;
+    private String databaseURL;
 
     // Constructor
     public MyDatabaseConnection(String JAWSDB_MARIA_URL) {
 
-        // Localhost
-        if (JAWSDB_MARIA_URL == null) {
-            log.info("Connecting to localhost...");
-            dataBaseURL = "jdbc:mysql://localhost:3306/burgers_db?createDatabaseIfNotExist=true";
-            userName = "root";
-            password = "root"; // "root" on PC or "" on Mac
+        // Check if running in Docker (Spring datasource URL is set)
+        String springDatasourceUrl = System.getenv("SPRING_DATASOURCE_URL");
+        String springDatasourceUsername = System.getenv("SPRING_DATASOURCE_USERNAME");
+        String springDatasourcePassword = System.getenv("SPRING_DATASOURCE_PASSWORD");
 
-            log.info("{}\n{}\n{}", dataBaseURL, userName, password);
+        if (springDatasourceUrl != null && springDatasourceUsername != null && springDatasourcePassword != null) {
+            log.info("Connecting using Spring datasource configuration...");
+            databaseURL = springDatasourceUrl;
+            userName = springDatasourceUsername;
+            password = springDatasourcePassword;
+
+            log.info("Database URL: {}, Username: {}", databaseURL, userName);
         }
-        // Heroku
+        // Localhost
+        else if (JAWSDB_MARIA_URL == null) {
+            log.info("Connecting to localhost...");
+            databaseURL = "jdbc:mysql://localhost:3306/burgers?createDatabaseIfNotExist=true";
+            userName = "yu71";
+            password = "53cret";
+
+            log.info("Database URL: {}, Username: {}", databaseURL, userName);
+        }
+        // AWS/Heroku
         else {
-            log.info("Connecting to AWS...");
-            dataBaseURL = "jdbc:mysql://" + JAWSDB_MARIA_URL.split("@")[1];
+            log.info("Connecting to cloud database...");
+            databaseURL = "jdbc:mysql://" + JAWSDB_MARIA_URL.split("@")[1];
             userName = JAWSDB_MARIA_URL.split(":")[1].split("//")[1];
             password = JAWSDB_MARIA_URL.split(":")[2].split("@")[0];
 
-            log.info("{}\n{}\n{}", dataBaseURL, userName, password);
+            log.info("Database URL: {}, Username: {}", databaseURL, userName);
         }
 
         // Set Variables
-        this.dataBaseURL = dataBaseURL;
+        this.databaseURL = databaseURL;
         this.userName = userName;
         this.password = password;
-
     }
 
-    // Getter for database URL
     public String getDatabaseURL() {
-        return dataBaseURL;
+        return databaseURL;
     }
 
-    // Getter for username
     public String getUsername() {
         return userName;
     }
 
-    // Getter for password
     public String getPassword() {
         return password;
     }
-
 }

@@ -1,25 +1,36 @@
 
 -- Database Creation
-CREATE DATABASE burgers;
+CREATE
+DATABASE IF NOT EXISTS burgers;
 USE burgers;
 
 
 -- Table Creation of Burgers
-CREATE TABLE burgers(
+CREATE TABLE if NOT EXISTS burgers
+(
 id INTEGER AUTO_INCREMENT PRIMARY KEY,
-burgerName VARCHAR(50),
+burger_name
+VARCHAR
+(
+50
+),
 devoured BOOLEAN);
 
 
 -- Table Creation of Devourers
-CREATE TABLE devourers(
+CREATE TABLE if NOT EXISTS devourers
+(
 id INTEGER AUTO_INCREMENT PRIMARY KEY,
-devourerName VARCHAR(50),
-burgerId INTEGER);
+devourer_name
+VARCHAR
+(
+50
+),
+    burger_id INTEGER);
 
 
 -- Seed Burgers into Database
-INSERT INTO burgers(burgerName, devoured)
+INSERT INTO burgers(burger_name, devoured)
 VALUES ("Big Mac", false),
   ("Whooper", false),
   ("Cheezburger", false),
@@ -30,5 +41,5 @@ VALUES ("Big Mac", false),
 
 
 -- Seed Devourers into Database
-INSERT INTO devourers(devourerName, burgerId)
+INSERT INTO devourers(devourer_name, burger_id)
 VALUES ("Tommy", 7);

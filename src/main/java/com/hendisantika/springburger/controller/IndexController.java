@@ -1,5 +1,6 @@
 package com.hendisantika.springburger.controller;
 
+import com.hendisantika.springburger.config.MyDatabaseConnection;
 import com.hendisantika.springburger.model.Burger;
 import com.hendisantika.springburger.model.Devourer;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Connection;
@@ -61,7 +63,7 @@ public class IndexController {
 
                 // Get Fields of Current ResultSet Row
                 int burgerId = readyBurgers.getInt("id");
-                String burgerName = readyBurgers.getString("burgerName");
+                String burgerName = readyBurgers.getString("burger_name");
 
                 // Print Fields (for de-bugging)
                 // String p = burgerId + " | " + burgerName;
@@ -78,7 +80,7 @@ public class IndexController {
 
             // Execute SQL Query for Eaten Burgers
             Statement findAllEaten = conn.createStatement();
-            ResultSet eatenBurgers = findAllEaten.executeQuery("SELECT * FROM burgers, devourers WHERE devourers.burgerid = burgers.id");
+            ResultSet eatenBurgers = findAllEaten.executeQuery("SELECT * FROM burgers, devourers WHERE devourers.burger_id = burgers.id");
 
             // Loop over the Query ResultSet and Append to HashMap of Edible Burgers
             HashMap<Integer, String[]> consumedBurgers = new HashMap<Integer, String[]>();
@@ -87,8 +89,8 @@ public class IndexController {
 
                 // Get Fields of Current ResultSet Row
                 int burgerId2 = eatenBurgers.getInt("id");
-                String burgerName2 = eatenBurgers.getString("burgerName");
-                String devourerName2 = eatenBurgers.getString("devourerName");
+                String burgerName2 = eatenBurgers.getString("burger_name");
+                String devourerName2 = eatenBurgers.getString("devourer_name");
                 String[] burgerNameAndDevourerName = {burgerName2, devourerName2};
 
                 // Print Fields (for de-bugging)
@@ -129,14 +131,17 @@ public class IndexController {
 
 
         // Create new Devourer class using Burger Id and Devourer Name (this is more for practice than anything else)
-        Devourer newBurgerEater = new Devourer(burgerEater, burgerId);
+        Devourer newBurgerEater = new Devourer((long) burgerId, burgerEater);
 
 
         // Connect to MySQL Database
         try {
 
             // Create MySQL Connection based on localhost or Heroku deployment
-            // This uses the instance variables created when the index route was hit
+            MyDatabaseConnection myDatabaseCredentials = new MyDatabaseConnection(System.getenv("JAWSDB_MARIA_URL"));
+            url = myDatabaseCredentials.getDatabaseURL();
+            userName = myDatabaseCredentials.getUsername();
+            password = myDatabaseCredentials.getPassword();
             Connection conn = DriverManager.getConnection(url, userName, password);
 
 
@@ -146,9 +151,9 @@ public class IndexController {
 
 
             // Insert a new devourer
-            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO devourers(devourername, burgerid) VALUES (?, ?)");
+            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO devourers(devourer_name, burger_id) VALUES (?, ?)");
             preparedStmt.setString(1, newBurgerEater.getDevourerName());
-            preparedStmt.setInt(2, newBurgerEater.getBurgerId());
+            preparedStmt.setLong(2, newBurgerEater.getBurgerId());
             preparedStmt.execute();
 
 
@@ -164,8 +169,8 @@ public class IndexController {
 
     }
 
-    @GetMapping("/cook")
-    public String devour(@RequestParam(value = "burgerName", required = true) String burgerName) {
+    @PostMapping("/cook")
+    public String devour(@RequestParam(value = "burgerName") String burgerName) {
 
         // Print Fields: Burger Name comes from Request Parameter
         log.info("Order Up!");
@@ -184,13 +189,16 @@ public class IndexController {
         try {
 
             // Create MySQL Connection based on localhost or Heroku deployment
-            // This uses the instance variables created when the index route was hit
+            MyDatabaseConnection myDatabaseCredentials = new MyDatabaseConnection(System.getenv("JAWSDB_MARIA_URL"));
+            url = myDatabaseCredentials.getDatabaseURL();
+            userName = myDatabaseCredentials.getUsername();
+            password = myDatabaseCredentials.getPassword();
             Connection conn = DriverManager.getConnection(url, userName, password);
 
             // Insert a new burger
-            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO burgers(burgername, devoured) VALUES (?, ?)");
+            PreparedStatement preparedStmt = conn.prepareStatement("INSERT INTO burgers(burger_name, devoured) VALUES (?, ?)");
             preparedStmt.setString(1, newBurger.getBurgerName());
-            preparedStmt.setBoolean(2, newBurger.getDevoured());
+            preparedStmt.setBoolean(2, newBurger.isDevoured());
             preparedStmt.execute();
 
             // Close MySQL Connection

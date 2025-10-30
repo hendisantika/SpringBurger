@@ -9,6 +9,7 @@ target/
 .settings
 .springBeans
 logs
+mysql_data
 
 ### IntelliJ IDEA ###
 .idea
