@@ -17,7 +17,7 @@ A re-make of my classic burger app using Java, Maven, MySQL, and the Spring Boot
 - Spring Web
 - Thymeleaf (Template Engine)
 - MySQL Database
-- Maven 3.9.11 (via Maven Wrapper `./mvnw`)
+- Maven 3.10.0 (via Maven Wrapper `./mvnw`)
 - Lombok (Reduces boilerplate code)
 
 ## Features
@@ -183,7 +183,7 @@ spring-burger/
 
 The application includes full Docker support with:
 
-- **Dockerfile**: Multi-stage build (`maven:3.9-eclipse-temurin-25-alpine` → `eclipse-temurin:25-jre-alpine`)
+- **Dockerfile**: Multi-stage build (`maven:3.9-eclipse-temurin-26-alpine` compiles with `--release 25` → runs on `eclipse-temurin:25-jre-alpine`)
 - **docker-compose.yml**: Complete setup with MySQL 26.7.0 database
 - **Automatic database initialization**: Schema is loaded on first startup
 - **Health checks**: Ensures MySQL is ready before starting the application
@@ -258,7 +258,7 @@ All PRs are labelled (`dependencies` + ecosystem) and assigned to the maintainer
 
 ## Recent Updates
 
-- **Upgraded to JDK 25** (pom, GitHub Actions, Docker images) and Maven Wrapper 3.9.11
+- **Upgraded to JDK 25** (pom, GitHub Actions, Docker images) and Maven Wrapper 3.10.0
 - Lombok is registered explicitly as an annotation processor (required since JDK 23)
 - **GitHub Actions is green again**: MySQL service container for tests, Docker build job
 - **Enhanced Dependabot**: grouped updates, labels, commit prefixes, Docker & Compose tracking
