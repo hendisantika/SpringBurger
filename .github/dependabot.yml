@@ -15,8 +15,9 @@ updates:
       - dependencies
       - java
     commit-message:
-      prefix: "build(deps)"
-      prefix-development: "build(deps-dev)"
+      # "include: scope" appends (deps)/(deps-dev) -> "build(deps): ..."
+      prefix: "build"
+      prefix-development: "build"
       include: scope
     groups:
       spring-boot:
@@ -72,8 +73,9 @@ updates:
       # Keep the Java 25 line for maven/temurin images
       - dependency-name: "eclipse-temurin"
         update-types: [ "version-update:semver-major" ]
+      # maven:3.9-eclipse-temurin-25-alpine floats on Maven 3.9.x already;
+      # Dependabot would otherwise swap the JDK suffix (e.g. temurin-26)
       - dependency-name: "maven"
-        update-types: [ "version-update:semver-major" ]
 
   - package-ecosystem: docker-compose
     directory: "/"
