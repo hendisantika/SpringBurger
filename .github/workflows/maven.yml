@@ -1,10 +1,5 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# Build & test SpringBurger with Maven on JDK 25.
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
 
 name: Java CI with Maven
 
@@ -13,23 +8,78 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-
+    name: Build & Test (JDK 25)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # required by the dependency submission step
+
+    services:
+      # The Spring context needs a live MySQL database (see contextLoads test)
+      mysql:
+        image: mysql:9.5.0
+        env:
+          MYSQL_DATABASE: burgers
+          MYSQL_USER: yu71
+          MYSQL_PASSWORD: 53cret
+          MYSQL_ROOT_PASSWORD: r00tP@ssw0rd
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uyu71 -p53cret"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          --health-start-period=30s
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/burgers
+      SPRING_DATASOURCE_USERNAME: yu71
+      SPRING_DATASOURCE_PASSWORD: 53cret
 
     steps:
-    - uses: actions/checkout@v7
-    - name: Set up JDK 25
-      uses: actions/setup-java@v6
-      with:
-        java-version: '25'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - uses: actions/checkout@v7
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@a64327a7329c9939cf675e458452febe1894a70c
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: ./mvnw -B -ntp verify
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+
+      # Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts
+      - name: Update dependency graph
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: advanced-security/maven-dependency-submission-action@a64327a7329c9939cf675e458452febe1894a70c
+
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build Docker image
+        run: docker build -t spring-burger:ci .
